@@ -102,7 +102,7 @@
             <a class=" nav-link @yield('customer')" href="{{route('customer.index')}}"> <i class="fas fa-users fa-fw text-primary"></i> 
               Kustomer
             </a>
-            <a class=" nav-link @yield('transaction')" href="{{route('transaction.index')}}"> <i class="fas fa-money-bill-wave fa-fw text-primary"></i> 
+            <a class=" nav-link @yield('transaction')" href="{{route('admin.transaksi.index')}}"> <i class="fas fa-money-bill-wave fa-fw text-primary"></i> 
               Transaksi
             </a>
             <a class=" nav-link @yield('setting')" href="{{route('rule.index')}}"> <i class="fas fa-cog fa-fw text-primary"></i> 

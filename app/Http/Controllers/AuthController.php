@@ -37,7 +37,7 @@ class AuthController extends Controller
             $User->save();
 
             DB::commit();
-            return redirect()->route('login')->with('message','Kustomer berhasil terdaftar');
+            return redirect()->route('auth.login')->with('message','Kustomer berhasil terdaftar');
         }catch(\Exception $e){
             DB::rollback();
             return redirect()->route('satker.index')->with('message','Data gagal tersimpan');
@@ -51,7 +51,7 @@ class AuthController extends Controller
             return redirect()->route('customer.index');
         }
 
-        return redirect()->route('login')->with('message','Login gagal. Cek kembali email dan password yang anda masukkan');
+        return redirect()->route('auth.login')->with('message','Login gagal. Cek kembali email dan password yang anda masukkan');
     }
 
     public function logout()

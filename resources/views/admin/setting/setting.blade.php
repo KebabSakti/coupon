@@ -31,7 +31,7 @@
                             <label>Nilai Transaksi</label>
                             <div class="row">
                                 <div class="col">
-                                    <input type="text" name="amount" class="form-control" required>
+                                    <input type="text" value="{{$data->value}}" name="amount" class="form-control num-format" required>
                                 </div>
                                 <div class="col">
                                     <span class="font-weight-bold amount"></span>
@@ -42,7 +42,7 @@
                             <label>Point</label>
                             <div class="row">
                                 <div class="col">
-                                    <input type="text" name="point" class="form-control" required>
+                                    <input type="text" value="{{$data->point}}" name="point" class="form-control num-format" required>
                                 </div>
                                 <div class="col">
                                     <span class="font-weight-bold point"></span>
@@ -69,7 +69,7 @@ $(function() {
     var valAmount = {!! $data->value !!};
     var valPoint = {!! $data->point !!};
 
-    $('input[name="amount"]').ionRangeSlider({
+    $('input[name="amounts"]').ionRangeSlider({
         skin: "round",
         min : 0,
         max : 1000001,
@@ -102,7 +102,7 @@ $(function() {
         }
     });
 
-    $('input[name="point"]').ionRangeSlider({
+    $('input[name="points"]').ionRangeSlider({
         skin: "round",
         min : 0,
         max : 100001,

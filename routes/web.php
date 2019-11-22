@@ -32,11 +32,12 @@ Route::group(['prefix' => 'public'], function () {
 
 //admin route
 Route::group(['prefix' => 'admin'], function () {
+    Route::get('transaksi', 'TransaksiController@index')->name('admin.transaksi.index');
+    Route::get('transaksi/data', 'TransaksiController@indexData')->name('admin.transaksi.index.data');
+    Route::get('transaksi/{id}', 'TransaksiController@detail')->name('admin.transaksi.detail');
+    Route::get('transaksi/{id}/data', 'TransaksiController@detailData')->name('admin.transaksi.detail.data');
+    Route::get('transaksi/{id}/hapus', 'TransaksiController@hapus')->name('admin.transaksi.hapus');
     Route::get('customer/dt', 'CustomerController@customerDT')->name('customer.index.dt');
-    Route::get('transaction/dt', 'TransactionController@transactionDT')->name('transaction.index.dt');
-    //Route::get('transaction/{transaction}/dt', 'TransactionController@showDT')->name('transaction.show.dt');
-    //Route::get('transaction/{transaction}/del', 'TransactionController@del')->name('transaction.del');
     Route::resource('customer', 'CustomerController');
-    Route::resource('transaction', 'TransactionController');
     Route::resource('rule', 'RuleController');
 });

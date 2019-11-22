@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Transaction;
-use App\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\CustomClass\MyNumeral;
+use App\Transaction;
+use App\Customer;
 
 class TransactionController extends Controller
 {
@@ -83,7 +83,7 @@ class TransactionController extends Controller
                 '<div class="text-center">'.$formatter->format($r->transactions->sum('value'), '0,0').'</div>',
                 '<div class="text-center">'.$formatter->format($r->transactions->sum('point'), '0,0').'</div>',
                 '<div class="text-center">
-                    <a href="'.route('transaction.show', $r->id).'" class="btn btn-sm btn-info" title="Detail"><i class="fas fa-info"></i> Detail</a>
+                    <a href="'.route('transaction.detail', $r->id).'" class="btn btn-sm btn-info" title="Detail"><i class="fas fa-info"></i> Detail</a>
                 </div>',
             );
         }
@@ -125,14 +125,18 @@ class TransactionController extends Controller
      */
     public function show(Transaction $transaction)
     {
-        $customer = Customer::find($transaction->id);
-
-        dd($customer);
-
-        return view('admin.transaksi.show', ['id' => $transaction->id, 'data' => $customer]);
+        //
     }
 
-    /*
+    public function detail(Transaction $transaction)
+    {
+        $customer = Customer::findOrFail($transaction->id);
+
+        dd($customer->toArray());
+
+        return view('admin.transaksi.detail', ['id' => $transaction->id, 'data' => $customer]);
+    }
+
     public function showDT(Transaction $transaction, Request $request)
     {
         $formatter = MyNumeral::formatter();
@@ -190,7 +194,7 @@ class TransactionController extends Controller
             'recordsFiltered' => $filter,
             'data' => $data
         ]);
-    }*/
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -226,7 +230,6 @@ class TransactionController extends Controller
         //return redirect()->route('transaction.index')->with('message', 'Transaksi berhasil dihapus');
     }
 
-    /*
     public function del(Transaction $transaction)
     {
         $transaction = Transaction::findOrFail($transaction->id);
@@ -234,5 +237,5 @@ class TransactionController extends Controller
         $transaction->delete();
 
         return redirect()->route('transaction.index')->with('message', 'Transaksi berhasil dihapus');
-    }*/
+    }
 }
