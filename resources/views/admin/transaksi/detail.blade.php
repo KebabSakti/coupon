@@ -15,53 +15,53 @@
         <!-- Table -->
         <div class="row">
             <div class="col">
-            <div class="card shadow">
-                <div class="card-header bg-transparent">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h3 class="mb-0">Detail Transaksi ({{$data->name}})</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col">
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control date-range-picker periode">
-                                <div class="input-group-append">
-                                    <button class="btn btn-info btn-sm" type="button"><i class="fas fa-calendar-alt"></i></button>
-                                </div>
+                <div class="card shadow">
+                    <div class="card-header bg-transparent">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Detail Transaksi ({{$data->name}})</h3>
                             </div>
                         </div>
-                        <!--
-                        <div class="col">
-                            <form action="" method="post" target="_blank">
-                                @csrf
-                                <input type="hidden" name="search" value="">
-                                <button type="submit" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Export PDF"><i class="fas fa-file-pdf"></i> Export</button>
-                            </form>
-                        </div>
-                        -->
-                        <div class="col-8">
-                            <div class="card-description float-right"></div>
-                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover table-sm table-bordered dt-ajax">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">Nilai</th>
-                                    <th class="text-center">Point</th>
-                                    <th class="text-center">Tanggal</th>
-                                    <th class="text-center"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control date-range-picker periode">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-info btn-sm" type="button"><i class="fas fa-calendar-alt"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--
+                            <div class="col">
+                                <form action="" method="post" target="_blank">
+                                    @csrf
+                                    <input type="hidden" name="search" value="">
+                                    <button type="submit" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Export PDF"><i class="fas fa-file-pdf"></i> Export</button>
+                                </form>
+                            </div>
+                            -->
+                            <div class="col-8">
+                                <div class="card-description float-right"></div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-sm table-bordered dt-ajax">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Nilai</th>
+                                        <th class="text-center">Point</th>
+                                        <th class="text-center">Tanggal</th>
+                                        <th class="text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
             </div>
         </div>
     </div>

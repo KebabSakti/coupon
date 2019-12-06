@@ -8,6 +8,6 @@ class Transaction extends Model
 {
     public function customer()
     {
-        return $this->hasOne(Customer::class);
+        return $this->belongsTo(Customer::class);
     }
 }

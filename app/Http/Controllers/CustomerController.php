@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Customer;
 use App\Transaction;
+use App\Nationality;
+use App\Rule;
+use App\CouponRedeem;
+use App\CouponRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -31,22 +35,28 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        return view('admin.kustomer.customer');
+        return view('admin.kustomer.customer', ['nationalities' => Nationality::all(), 'rules' => Rule::all()]);
     }
 
     public function customerDT(Request $request)
     {
-        $col = array('customer_code', 'name', 'phone', 'address', 'created_at', 'updated_at', '');
+        $col = array('customer_code', 'name', 'mobile', '', '', 'commence_on', 'expires_on','');
 
         $range = (strstr($request->search['value'], '|') == false) ? false:explode('|', $request->search['value']);
         $start = ($range == false) ? '':$range[0];
         $end = ($range == false) ? '':$range[1];
+        $alt = ($range == false) ? '':$range[2];
 
-        $query = DB::table('customers');
+        $query = Customer::with(['rule', 'transactions']);
 
         if($range){
-            $query->whereDate('created_at', '>=', $start)
-                  ->whereDate('created_at', '<=', $end);
+            if($alt == 'false'){
+                $query->whereDate('commence_on', '>=', $start)
+                      ->whereDate('commence_on', '<=', $end);
+            }else{
+                $query->whereDate('expires_on', '>=', $start)
+                      ->whereDate('expires_on', '<=', $end);
+            }
         }
 
         if(!empty($request->search['value'])){
@@ -54,8 +64,7 @@ class CustomerController extends Controller
                 $query->where(function($q) use($request) {
                         $q->where('customer_code', 'like', '%'.$request->search['value'].'%')
                           ->orWhere('name', 'like', '%'.$request->search['value'].'%')
-                          ->orWhere('phone', 'like', '%'.$request->search['value'].'%')
-                          ->orWhere('address', 'like', '%'.$request->search['value'].'%');
+                          ->orWhere('mobile', 'like', '%'.$request->search['value'].'%');
                 });
             }
         }
@@ -75,15 +84,25 @@ class CustomerController extends Controller
 
         $data = [];
         foreach ($customer as $r) {
+            $redeemed = CouponRedeem::where('customer_id', $r->id)->get();
+            $couponrule = CouponRule::first();
+            $point = $r->transactions->sum('point') - ($redeemed->count() * $couponrule->point);
+            
             $data[] = array(
                 '<div class="text-center">'.Str::limit($r->customer_code, 20).'</div>', 
                 '<div class="text-center">'.$r->name.'</div>',
-                '<div class="text-center">'.$r->phone.'</div>',
-                '<div class="text-center">'.Str::limit($r->address, 20).'</div>',
-                '<div class="text-center">'.Carbon::createFromFormat('Y-m-d H:i:s', $r->created_at)->Timezone('GMT+8')->format('d/m/Y H:i:s').'</div>',
-                '<div class="text-center">'.Carbon::createFromFormat('Y-m-d H:i:s', $r->updated_at)->Timezone('GMT+8')->format('d/m/Y H:i:s').'</div>',
+                '<div class="text-center">'.$r->mobile.'</div>',
+                '<div class="text-center">'.$r->rule->card_name.'</div>',
+                '<div class="text-center">'.$point.'</div>',
+                '<div class="text-center">'.Carbon::createFromFormat('Y-m-d', $r->commence_on)->Timezone('GMT+8')->format('d/m/Y').'</div>',
+                '<div class="text-center">'.Carbon::createFromFormat('Y-m-d', $r->expires_on)->Timezone('GMT+8')->format('d/m/Y').'</div>',
                 '<div class="text-center">
                     <a href="'.route('customer.edit', $r->id).'" class="btn btn-sm btn-info" title="Detail"><i class="fas fa-info"></i> Detail</a>
+                    <form method="post" action="'.route('customer.destroy', $r->id).'" style="display:inline-block;">
+                        <input type="hidden" name="_token" value="'.csrf_token().'">
+                        <input type="hidden" name="_method" value="delete">
+                        <button type="submit" class="btn btn-sm btn-danger confirm" title="Hapus"><i class="fas fa-trash"></i> Delete</button>
+                    </form>
                 </div>',
             );
         }
@@ -116,7 +135,10 @@ class CustomerController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'phone' => 'required',
+            'rule_id' => 'required',
+            'customer_code' => 'required|unique:customers,customer_code',
+            'commence_on' => 'required',
+            'expires_on' => 'required'
         ]);
 
         DB::beginTransaction();
@@ -124,10 +146,10 @@ class CustomerController extends Controller
             $customer = new Customer;
 
             $file = $request->file('profile');
-            $name = Str::random(40).'.'.$file->getClientOriginalExtension();
-            $path = 'img/profile/'.$name;
-
             if(!empty($file)){
+                $name = Str::random(40).'.'.$file->getClientOriginalExtension();
+                $path = 'img/profile/'.$name;
+
                 Image::make($file)->resize(null, 400, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
@@ -136,18 +158,28 @@ class CustomerController extends Controller
                 $customer->profile = $name;
             }
 
-            $customer->customer_code = mt_rand(100000000000, 999999999999);
+            $customer->customer_code = $request->customer_code;
             $customer->name = $request->name;
             $customer->phone = $request->phone;
             $customer->address = $request->address;
+            $customer->rule_id = $request->rule_id;
+            $customer->postal_code = $request->postal_code;
+            $customer->fax = $request->fax;
+            $customer->mobile = $request->mobile;
+            $customer->email = $request->email;
+            $customer->sex = $request->sex;
+            $customer->birth_date = Carbon::createFromFormat('d/m/Y', $request->birth_date)->Timezone('GMT+8')->format('Y-m-d');
+            $customer->nationality = $request->nationality;
+            $customer->commence_on = Carbon::createFromFormat('d/m/Y', $request->commence_on)->Timezone('GMT+8')->format('Y-m-d');
+            $customer->expires_on = Carbon::createFromFormat('d/m/Y', $request->expires_on)->Timezone('GMT+8')->format('Y-m-d');
             $customer->save();
 
             DB::commit();
 
-            return redirect()->route('customer.index')->with('message', 'Data berhasil ditambahkan');
+            return redirect()->route('customer.index')->with('message', 'Data added');
         }catch(\Exception $e){
             DB::rollback();
-            return redirect()->route('customer.index')->with('message', 'Data gagal tersimpan');
+            return redirect()->route('customer.index')->with('message', 'Data error');
         }
     }
 
@@ -172,7 +204,7 @@ class CustomerController extends Controller
     {
         $customer = Customer::findOrFail($customer->id);
 
-        return view('admin.kustomer.edit', ['data' => $customer]);
+        return view('admin.kustomer.edit', ['data' => $customer, 'nationalities' => Nationality::all(), 'rules' => Rule::all()]);
     }
 
     /**
@@ -186,19 +218,32 @@ class CustomerController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'phone' => 'required',
+            'rule_id' => 'required',
+            //'customer_code' => 'required|unique:customers,customer_code',
+            'commence_on' => 'required',
+            'expires_on' => 'required'
         ]);
 
         DB::beginTransaction();
         try {
             $customer = Customer::findOrFail($customer->id);
 
+            //resize and upload picture
             if($request->hasFile('profile')){
-                $file = $request->file('profile');
-                $name = Str::random(40).'.'.$file->getClientOriginalExtension();
-                $path = 'img/profile/'.$name;
+                //remove old file
+                if($customer->profile != NULL){
+                    $oldpath = 'img/profile/'.$customer->profile;
+                    if(file_exists($oldpath)){
+                        unlink($oldpath);
+                    }
+                }
 
+                //upload new file
+                $file = $request->file('profile');
                 if(!empty($file)){
+                    $name = Str::random(40).'.'.$file->getClientOriginalExtension();
+                    $path = 'img/profile/'.$name;
+
                     Image::make($file)->resize(null, 400, function ($constraint) {
                         $constraint->aspectRatio();
                         $constraint->upsize();
@@ -206,17 +251,22 @@ class CustomerController extends Controller
 
                     $customer->profile = $name;
                 }
-
-                //remove old file
-                $oldpath = 'img/profile/'.$customer->profile;
-                if(File::exists(asset($oldpath))){
-                    unlink($oldpath);
-                }
             }
 
+            $customer->customer_code = $request->customer_code;
             $customer->name = $request->name;
             $customer->phone = $request->phone;
             $customer->address = $request->address;
+            $customer->rule_id = $request->rule_id;
+            $customer->postal_code = $request->postal_code;
+            $customer->fax = $request->fax;
+            $customer->mobile = $request->mobile;
+            $customer->email = $request->email;
+            $customer->sex = $request->sex;
+            $customer->birth_date = Carbon::createFromFormat('d/m/Y', $request->birth_date)->Timezone('GMT+8')->format('Y-m-d');
+            $customer->nationality = $request->nationality;
+            $customer->commence_on = Carbon::createFromFormat('d/m/Y', $request->commence_on)->Timezone('GMT+8')->format('Y-m-d');
+            $customer->expires_on = Carbon::createFromFormat('d/m/Y', $request->expires_on)->Timezone('GMT+8')->format('Y-m-d');
             $customer->save();
 
             DB::commit();
@@ -239,14 +289,19 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail($customer->id);
 
         //remove old file
-        $oldpath = 'img/profile/'.$customer->profile;
-        if(File::exists(asset($oldpath))){
-            unlink($oldpath);
+        if($customer->profile != NULL){
+            $oldpath = 'img/profile/'.$customer->profile;
+            if(file_exists($oldpath)){
+                unlink($oldpath);
+            }
         }
 
         //remove any associate data from this customer
         $transaction = Transaction::where('customer_id', $customer->id);
         $transaction->delete();
+
+        $coupon = CouponRedeem::where('customer_id', $customer->id);
+        $coupon->delete();
 
         //remove data from database
         $customer->delete();

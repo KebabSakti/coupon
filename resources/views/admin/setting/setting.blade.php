@@ -5,53 +5,114 @@
 @endsection
 
 @section('brand')
-    Setting Point
+    Setting
 @endsection
 
 @section('content')
+    @component('component.modal', ['target' => 'card'])
+    @slot('title')
+        ADD DATA
+    @endslot
+
+    <form method="POST" action="{{route('rule.store')}}" enctype="multipart/form-data">
+        @csrf
+        <div class="form-group">
+            <label>Card Name</label>
+            <input type="text" class="form-control" name="card_name" required>
+        </div>
+        <div class="form-group">
+            <label>Value</label>
+            <input type="text" class="form-control num-format" name="value" required>
+        </div>
+        <div class="form-group">
+            <label>Point</label>
+            <input type="text" class="form-control num-format" name="point" required>
+        </div>
+        <div class="form-group">
+            <div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+    @endcomponent
 
     <!-- Page content -->
     <div class="container-fluid mt--7">
         <!-- Table -->
-        <div class="row">
+        <div class="row mb-2">
             <div class="col">
             <div class="card shadow">
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
                         <div class="col-8">
-                            <h3 class="mb-0">Setting</h3>
+                            <h3 class="mb-0">Point Redeem Setting</h3>
+                        </div>
+                        <div class="col-4 text-right">
+                            <a href="#!" class="btn btn-primary" data-toggle="modal" data-target="#card"><i class="fas fa-plus-circle fa-fw"></i> Add Data</a>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{route('rule.update', $data->id)}}" enctype="multipart/form-data">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-sm table-bordered dt-ajax-coupon">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Card Type</th>
+                                    <th class="text-center">Value</th>
+                                    <th class="text-center">Point</th>
+                                    <th class="text-center">Date Created</th>
+                                    <th class="text-center">Date Updated</th>
+                                    <th class="text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($rules as $rule)
+                                    <tr>
+                                        <td class="text-center">{{$rule->card_name}}</td>
+                                        <td class="text-center idr">{{$rule->value}}</td>
+                                        <td class="text-center idr">{{$rule->point}}</td>
+                                        <td class="text-center">{{Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $rule->created_at)->Timezone('GMT+8')->format('d/m/Y H:i:s')}}</td>
+                                        <td class="text-center">{{Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $rule->updated_at)->Timezone('GMT+8')->format('d/m/Y H:i:s')}}</td>
+                                        <td class="text-center">
+                                            <a href="{{route('rule.show', $rule->id)}}" class="btn btn-sm btn-info" title="Detail"><i class="fas fa-info"></i> Detail</a>
+                                            <form method="post" action="{{route('rule.destroy', $rule->id)}}" style="display:inline-block;">
+                                                @csrf
+                                                @method('delete')
+                                                <button type="submit" class="btn btn-sm btn-danger confirm" title="Hapus"><i class="fas fa-trash"></i> Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h3 class="mb-0">Coupon Redeem Setting</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{route('rule.coupon', $coupon->id)}}" enctype="multipart/form-data">
                         @csrf
                         @method('put')
                         <div class="form-group">
-                            <label>Nilai Transaksi</label>
-                            <div class="row">
-                                <div class="col">
-                                    <input type="text" value="{{$data->value}}" name="amount" class="form-control num-format" required>
-                                </div>
-                                <div class="col">
-                                    <span class="font-weight-bold amount"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
                             <label>Point</label>
-                            <div class="row">
-                                <div class="col">
-                                    <input type="text" value="{{$data->point}}" name="point" class="form-control num-format" required>
-                                </div>
-                                <div class="col">
-                                    <span class="font-weight-bold point"></span>
-                                </div>
-                            </div>
+                            <input type="text" class="form-control num-format num-format" name="point" value="{{$coupon->point}}" required>
+                            <span class="text-danger">* Set how much point to use for 1 coupon reward</span>
                         </div>
                         <div class="form-group">
                             <div>
-                                <button type="submit" class="btn btn-primary btn-rule">Update Rule</button>
+                                <button type="submit" class="btn btn-primary">Update</button>
                             </div>
                         </div>
                     </form>
@@ -66,77 +127,7 @@
 @push('scripts')
 <script>
 $(function() {
-    var valAmount = {!! $data->value !!};
-    var valPoint = {!! $data->point !!};
-
-    $('input[name="amounts"]').ionRangeSlider({
-        skin: "round",
-        min : 0,
-        max : 1000001,
-        from : {!! $data->value !!},
-        step : 1000,
-        onChange : function(data) {
-            if(data.from == data.max){
-                amount.update({
-                    min : data.from - 1,
-                    max : data.from + 1000000,
-                    from : data.from + (1000000 - 200000),
-                    step : 1000
-                });
-            }else if(data.from == data.max-1000001 && data.from != 0){
-                amount.update({
-                    min : data.from - 1000000,
-                    max : data.max - 1000000,
-                    from : data.from - 800000,
-                    step : 1000
-                });
-            }
-
-            valAmount = data.from;
-
-            if(valAmount == 0 || valPoint == 0){
-                $('.btn-rule').prop('disabled', true);
-            }else{
-                $('.btn-rule').prop('disabled', false);
-            }
-        }
-    });
-
-    $('input[name="points"]').ionRangeSlider({
-        skin: "round",
-        min : 0,
-        max : 100001,
-        from : {!! $data->point !!},
-        step : 10,
-        onChange : function(data) {
-            if(data.from == data.max){
-                point.update({
-                    min : data.from - 1,
-                    max : data.from + 100000,
-                    from : data.from + (100000 - 20000),
-                    step : 10
-                });
-            }else if(data.from == data.max-100001 && data.from != 0){
-                point.update({
-                    min : data.from - 100000,
-                    max : data.max - 100000,
-                    from : data.from - 80000,
-                    step : 10
-                });
-            }
-
-            valPoint = data.from;
-
-            if(valAmount == 0 || valPoint == 0){
-                $('.btn-rule').prop('disabled', true);
-            }else{
-                $('.btn-rule').prop('disabled', false);
-            }
-        }
-    });
-
-    let amount = $('input[name="amount"]').data("ionRangeSlider");
-    let point = $('input[name="point"]').data("ionRangeSlider");
+    
 });
 </script>
 @endpush

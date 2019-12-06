@@ -7,7 +7,9 @@ use App\CustomClass\MyNumeral;
 use App\Transaction;
 use App\Rule;
 use App\Customer;
+use App\CouponRule;
 use Carbon\Carbon;
+use App\CouponRedeem;
 
 class AppController extends Controller
 {
@@ -62,45 +64,30 @@ class AppController extends Controller
 
     public function search(Request $request)
     {
-        $Customer = Customer::with('transactions')
-                            ->where('customer_code', 'like', '%'.$request->search.'%')
-                            ->orWhere('name', 'like', '%'.$request->search.'%')
-                            ->orWhere('phone', 'like', '%'.$request->search.'%')
+        $today = Carbon::now()->Timezone('GMT+8')->format('Y-m-d');
+
+        $Customer = Customer::with(['transactions', 'rule'])
+                            ->where('customer_code', $request->search)
+                            ->whereDate('expires_on', '>=', $today)
                             ->get();
 
+        if(count($Customer) > 0){
+            $redeemed = CouponRedeem::where('customer_id', $Customer[0]->id)->get();
+            $couponrule = CouponRule::first();
+            $point = $Customer[0]->transactions->sum('point') - ($redeemed->count() * $couponrule->point);
+        }else{
+            $point = 0;
+        }
+
         return response()->json([
-            'transaksi' => (count($Customer) > 0) ? $Customer[0]->transactions->count(): 0,
-            'nilai' => (count($Customer) > 0) ? $Customer[0]->transactions->sum('value'): 0,
-            'point' => (count($Customer) > 0) ? $Customer[0]->transactions->sum('point'): 0,
-            'data' => $Customer
+            'point' => $point,
+            'data' => $Customer->toArray(),
+            'coupon_rule' => CouponRule::first()->toArray()
         ]);
     }
 
     public function redeem(Request $request)
     {
-        $Rule = Rule::find(1);
-        $value = $Rule->value;
-        $point = $Rule->point;
-        $mod = $request->amount % $value;
-        $redeem = floor((($request->amount - $mod) / $value) * $point); 
-
-        if($request->amount < $value){
-            $status = false;
-            $msg = 'Gagal menyimpan transaksi. Nilai transaksi tidak boleh lebih kecil dari '.$value;
-        }else{
-            $Transaction = new Transaction;
-            $Transaction->customer_id = $request->customer_id;
-            $Transaction->value = $request->amount;
-            $Transaction->point = $redeem;
-            $Transaction->save();
-
-            $status = true;
-            $msg = 'Transaksi berhasil tersimpan';
-        }
-
-        return response()->json([
-            'status' => $status,
-            'msg' => $msg
-        ]);
+        
     }
 }

@@ -10,4 +10,14 @@ class Customer extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function coupons()
+    {
+        return $this->hasMany(CouponRedeem::class);
+    }
+
+    public function rule()
+    {
+        return $this->belongsTo(Rule::class);
+    }
 }

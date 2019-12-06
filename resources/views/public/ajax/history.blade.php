@@ -2,9 +2,9 @@
     <table class="table table-striped table-hover table-sm table-bordered dt">
         <thead>
             <tr>
-                <th class="text-center">Tanggal Transaksi</th>
-                <th class="text-center">Nilai Transaksi</th>
-                <th class="text-center">Poin</th>
+                <th class="text-center">Transaction Date</th>
+                <th class="text-center">Transaction Amount</th>
+                <th class="text-center">Point</th>
             </tr>
         </thead>
         <tbody>

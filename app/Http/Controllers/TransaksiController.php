@@ -9,6 +9,7 @@ use App\CustomClass\MyNumeral;
 use Carbon\Carbon;
 use App\Transaction;
 use App\Customer;
+use App\CouponRedeem;
 
 class TransaksiController extends Controller
 {
@@ -26,7 +27,7 @@ class TransaksiController extends Controller
     {
         $formatter = MyNumeral::formatter();
 
-        $col = array('name', '', '', '', '', '');
+        $col = array('customer_code', 'name', 'mobile', '', '', '', '');
 
         $range = (strstr($request->search['value'], '|') == false) ? false:explode('|', $request->search['value']);
         $start = ($range == false) ? '':$range[0];
@@ -44,8 +45,7 @@ class TransaksiController extends Controller
                 $query->where(function($q) use($request) {
                     $q->where('customer_code', 'like', '%'.$request->search['value'].'%')
                       ->orWhere('name', 'like', '%'.$request->search['value'].'%')
-                      ->orWhere('phone', 'like', '%'.$request->search['value'].'%')
-                      ->orWhere('address', 'like', '%'.$request->search['value'].'%');
+                      ->orWhere('mobile', 'like', '%'.$request->search['value'].'%');
                 });
             }
         }
@@ -66,6 +66,7 @@ class TransaksiController extends Controller
         $data = [];
         foreach ($customer as $r) {
             $data[] = array(
+                '<div class="text-center">'.$r->customer_code.'</div>',
                 '<div class="text-center">'.$r->name.'</div>',
                 '<div class="text-center">'.$r->phone.'</div>',
                 '<div class="text-center">'.$formatter->format($r->transactions->count(), '0,0').'</div>',
@@ -85,11 +86,80 @@ class TransaksiController extends Controller
         ]);
     }
 
+    public function couponData(Request $request)
+    {
+        $formatter = MyNumeral::formatter();
+
+        $col = array('customer_code', 'name', 'mobile', '', '', '');
+
+        $range = (strstr($request->search['value'], '|') == false) ? false:explode('|', $request->search['value']);
+        $start = ($range == false) ? '':$range[0];
+        $end = ($range == false) ? '':$range[1];
+
+        $query = Customer::with('coupons')->has('coupons');
+
+        if($range){
+            $query->whereDate('created_at', '>=', $start)
+                  ->whereDate('created_at', '<=', $end);
+        }
+
+        if(!empty($request->search['value'])){
+            if(!$range){
+                $query->where(function($q) use($request) {
+                    $q->where('customer_code', 'like', '%'.$request->search['value'].'%')
+                      ->orWhere('name', 'like', '%'.$request->search['value'].'%')
+                      ->orWhere('mobile', 'like', '%'.$request->search['value'].'%');
+                });
+            }
+        }
+
+        $customer = $query->orderBy($col[$request->order[0]['column']], $request->order[0]['dir'])
+                          ->offset($request->start)
+                          ->limit($request->length)
+                          ->get();
+        
+        //total record
+        $total = $query->get()->count();
+        //total record with search value
+        $filter = (!empty($request->search['value'])) ? 
+            $customer->count()
+            :
+            $total;
+
+        $data = [];
+        foreach ($customer as $r) {
+            $data[] = array(
+                '<div class="text-center">'.$r->customer_code.'</div>',
+                '<div class="text-center">'.$r->name.'</div>',
+                '<div class="text-center">'.$r->phone.'</div>',
+                '<div class="text-center">'.$formatter->format($r->coupons->count(), '0,0').'</div>',
+                '<div class="text-center">'.$formatter->format($r->coupons->sum('point'), '0,0').'</div>',
+                '<div class="text-center">
+                    <a href="'.route('admin.transaksi.coupon.detail', $r->id).'" class="btn btn-sm btn-info" title="Detail"><i class="fas fa-info"></i> Detail</a>
+                </div>',
+            );
+        }
+
+        return response()->json([
+            'draw' => (int)$request->draw++,
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filter,
+            'data' => $data
+        ]);
+    }
+
     public function detail($id)
     {
         $customer = Customer::findOrFail($id);
 
         return view('admin.transaksi.detail', ['id' => $id, 'data' => $customer]);
+    }
+
+    public function couponDetail($id)
+    {
+        $customer = Customer::findOrFail($id);
+
+        return view('admin.transaksi.coupon', ['id' => $id, 'data' => $customer]);
     }
 
     public function detailData(Request $request, $id)
@@ -151,12 +221,78 @@ class TransaksiController extends Controller
         ]);
     }
 
+    public function couponDetailData(Request $request, $id)
+    {
+        $formatter = MyNumeral::formatter();
+
+        $col = array('', 'created_at', '');
+
+        $range = (strstr($request->search['value'], '|') == false) ? false:explode('|', $request->search['value']);
+        $start = ($range == false) ? '':$range[0];
+        $end = ($range == false) ? '':$range[1];
+
+        $query = CouponRedeem::where('customer_id', $id);
+
+        if($range){
+            $query->whereDate('created_at', '>=', $start)
+                  ->whereDate('created_at', '<=', $end);
+        }
+
+        if(!empty($request->search['value'])){
+            if(!$range){
+                $query->where(function($q) use($request) {
+                    $q->where('coupon_code', 'like', '%'.$request->search['value'].'%');
+                });
+            }
+        }
+
+        $transaction = $query->orderBy($col[$request->order[0]['column']], $request->order[0]['dir'])
+                             ->offset($request->start)
+                             ->limit($request->length)
+                             ->get();
+        
+        //total record
+        $total = $query->get()->count();
+        //total record with search value
+        $filter = (!empty($request->search['value'])) ? 
+            $transaction->count()
+            :
+            $total;
+
+        $data = [];
+        foreach ($transaction as $r) {
+            $data[] = array(
+                '<div class="text-center">'.$r->coupon_code.'</div>',
+                '<div class="text-center">'.Carbon::createFromFormat('Y-m-d H:i:s', $r->created_at)->Timezone('GMT+8')->format('d/m/Y H:i:s').'</div>',
+                '<div class="text-center">
+                    <a href="'.route('admin.transaksi.coupon.hapus', $r->id).'" class="btn btn-sm btn-danger confirm" title="Hapus"><i class="fas fa-trash"></i> Hapus</a>
+                </div>',
+            );
+        }
+
+        return response()->json([
+            'draw' => (int)$request->draw++,
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filter,
+            'data' => $data
+        ]);
+    }
+
     public function hapus($id)
     {
         $transaction = Transaction::findOrFail($id);
 
         $transaction->delete();
 
-        return redirect()->route('admin.transaksi.index')->with('message', 'Transaksi berhasil dihapus');
+        return redirect()->back()->with('message', 'Data deleted');
+    }
+
+    public function hapusCoupon($id)
+    {
+        $transaction = CouponRedeem::findOrFail($id);
+
+        $transaction->delete();
+
+        return redirect()->back()->with('message', 'Data deleted');
     }
 }

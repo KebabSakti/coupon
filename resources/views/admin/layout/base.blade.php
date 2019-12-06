@@ -20,10 +20,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>
-    Coupun App Admin Page
+      Redeem Coupon App - SCORE SPORTS AND LOUNGE
   </title>
   <!-- Favicon -->
-<link href="{{asset('img/brand/favicon.png')}}" rel="icon" type="image/png">
+<link href="{{asset('img/brand/score.png')}}" rel="icon" type="image/png">
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
   <!-- Icons -->
@@ -48,12 +48,12 @@
       <!-- Brand -->
       <div class="row justify-content-center">
         <div class="col text-center">
-            <img src="{{asset('img/brand/LOGO.png')}}" width="100">
+            <img src="{{asset('img/brand/score.png')}}" width="200">
         </div>
       </div>
       <a class="navbar-brand pt-0" href="">
         <br>
-        Halaman Admin
+        Admin Page
       </a>
       <!-- User -->
       <ul class="nav align-items-center d-md-none">
@@ -100,10 +100,13 @@
         <ul class="navbar-nav">
           <li class="nav-item"  class="active">
             <a class=" nav-link @yield('customer')" href="{{route('customer.index')}}"> <i class="fas fa-users fa-fw text-primary"></i> 
-              Kustomer
+              Customer
             </a>
-            <a class=" nav-link @yield('transaction')" href="{{route('admin.transaksi.index')}}"> <i class="fas fa-money-bill-wave fa-fw text-primary"></i> 
-              Transaksi
+            <a class=" nav-link @yield('redeem')" href="{{route('point.index')}}"> <i class="fas fa-coins fa-fw text-primary"></i> 
+              Redeem
+            </a>
+            <a class=" nav-link @yield('transaction')" href="{{route('admin.transaksi.index')}}"> <i class="fas fa-receipt fa-fw text-primary"></i> 
+              History
             </a>
             <a class=" nav-link @yield('setting')" href="{{route('rule.index')}}"> <i class="fas fa-cog fa-fw text-primary"></i> 
               Setting
@@ -122,7 +125,7 @@
     <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
         <div class="container-fluid">
             <!-- Brand -->
-            <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href=""></a>
+            <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="">@yield("brand")</a>
             <!-- User -->
             <ul class="navbar-nav align-items-center d-none d-md-flex">
               <li class="nav-item dropdown">

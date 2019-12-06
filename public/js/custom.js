@@ -18,14 +18,6 @@ $(function() {
         });
     }
     //format number on change
-    $('body').on('keyup', '.num-format', function() {
-        pokok = parseFloat($('input[name="hutang_pokok"]').val());
-        bunga = parseFloat($('input[name="bunga"]').val());
-        denda = parseFloat($('input[name="denda"]').val());
-        total = pokok+bunga+denda;
-
-        $('input[name="total"]').val(total);
-    });
     $('.num-format').number(true);
     //data table init
     $('.data-table').DataTable({
@@ -35,10 +27,23 @@ $(function() {
     $('.date-picker').daterangepicker({
         singleDatePicker: true,
         showDropdowns: true,
+        drops : 'up',
         locale: {
             format: 'DD/MM/YYYY'
         }
     });
+    //date picker expires
+    if($('input[name="expires_on"]').length > 0){
+        $('input[name="expires_on"]').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            drops : 'up',
+            startDate : moment().add(1, 'y'),
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+        });
+    }
     //date range picker
     $('.date-range-picker').daterangepicker({
         'locale': {
@@ -61,7 +66,7 @@ $(function() {
     });
     //confirm btn
 	$('body').on('click', '.confirm', function(){
-		if(confirm('Proses ini tidak dapat dikembalikan. lanjutkan?')){
+		if(confirm('This process cannot be undone, continue?')){
 			return true;
 		}else{
 			return false;

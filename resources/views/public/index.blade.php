@@ -20,10 +20,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>
-    Argon Dashboard - Free Dashboard for Bootstrap 4 by Creative Tim
+    Redeem Coupon App - SCORE SPORTS AND LOUNGE
   </title>
   <!-- Favicon -->
-  <link href="../assets/img/brand/favicon.png" rel="icon" type="image/png">
+  <link href="../img/brand/score.png" rel="icon" type="image/png">
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
   <!-- Icons -->
@@ -37,67 +37,45 @@
 <body class="">
   <div class="main-content">
     <!-- Header -->
-    <div class="header d-flex align-items-center" style="min-height: 100px; background-size: cover; background-position: center top;">
-      <!-- Mask -->
-      <span class="mask bg-gradient-default opacity-8"></span>
+    <div class="text-center bg-primary" style="min-height:300px;">
+      <img src="{{asset('img/brand/score.png')}}" width="250" class="img-fluid">
     </div>
 
     <!-- Page content -->
-    <div class="container-fluid" style="margin-top:-30px;">
+    <div class="container-fluid" style="margin-top:-120px;">
       <div class="row" style="margin-bottom:5px;">
         <div class="col">
-          <div class="card card-profile shadow">
-            <div class="row justify-content-center">
-              <div class="col-lg-3 order-lg-2">
-                <div class="card-profile-image">
-                  <a href="#">
-                    <img src="../img/brand/LOGO.PNG" class="rounded-circle profile">
-                  </a>
-                </div>
-              </div>
+          <div class="card shadow">
+            <div class="card-header text-center">
+              <img src="{{asset('img/profile/person.png')}}" width="150" class="rounded profile">
             </div>
-            <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
-              <div class="d-flex justify-content-between">
-                <!--
-                <a href="#" class="btn btn-sm btn-info mr-4">Connect</a>
-                <a href="#" class="btn btn-sm btn-default float-right">Message</a>
-                -->
-              </div>
-            </div>
-            <div class="card-body pt-0 pt-md-4">
-              <div class="row">
-                <div class="col">
-                  <div class="card-profile-stats d-flex justify-content-center mt-md-5">
-                    <div>
-                      <span class="heading transaksi">0</span>
-                      <span class="description">Transaksi</span>
-                    </div>
-                    <div>
-                      <span class="heading nilai">0</span>
-                      <span class="description">Total</span>
-                    </div>
-                    <div>
-                      <span class="heading point">0</span>
-                      <span class="description">Point</span>
-                    </div>
+            <div class="card-body">
+              <form>
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">Customer ID</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control customer-id" placeholder="Customer ID" value="" readonly>
                   </div>
                 </div>
-              </div>
-              <div class="text-center">
-                <h3 class="nama">
-                  Nama Kustomer
-                </h3>
-                <div class="h5 font-weight-300 notlp">
-                  <i class="ni location_pin mr-2"></i>No Telp Kustomer
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">Customer Name</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control customer-name" placeholder="Customer Name" value="" readonly>
+                  </div>
                 </div>
-                <div class="h5 mt-4">
-                  <i class="ni business_briefcase-24 mr-2"></i>
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">Card Type</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control card-type" placeholder="Card Type" value="" readonly>
+                  </div>
                 </div>
-                <div class="alamat">
-                  <i class="ni education_hat mr-2"></i>Alamat Kustomer
+                <div class="form-group row">
+                  <label class="col-sm-2 col-form-label">Total Point</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control total-point" placeholder="Total Point" value="" readonly>
+                  </div>
                 </div>
-                <br>
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -107,16 +85,15 @@
           <div class="col">
             <div class="card card-profile shadow">
                 <div class="card-body">
-                    <form class="redeem-point">
+                    <form method="post" action="#" class="redeem-point">
                         <div class="row">
                             <div class="col">
-                                <input type="text" class="form-control" name="keyword" placeholder="Kode / Nama / No. Hp Kustomer" required>
-                            </div>
-                            <div class="col">
-                                <input type="text" class="form-control num-format" name="nilai_transaksi" placeholder="Total Nilai Transaksi" required disabled>
-                            </div>
-                            <div class="col">
-                                <button type="button" class="btn btn-primary btn-block btn-history" disabled>Redeem</button>
+                              <div class="input-group">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Customer ID" name="keyword" disabled>
+                              </div>
                             </div>
                         </div>
                     </form>
@@ -131,7 +108,7 @@
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
                         <div class="col-8">
-                            <h3 class="mb-0">Riwayat Transaksi</h3>
+                            <h3 class="mb-0">Transaction History</h3>
                         </div>
                     </div>
                 </div>
@@ -203,30 +180,7 @@
   <!-- Custom Script For This Page -->
   <script>
     $(function() {
-        /*
-        var table = $('.dt-ajax').DataTable({
-            dom: 'tp',
-            processing: true,
-            serverSide: true,
-            columns:[
-                {'searchable':false, 'orderable':true},
-                {'searchable':false, 'orderable':false},
-                {'searchable':false, 'orderable':false},
-                {'searchable':false, 'orderable':false},
-            ],
-            order: [[0, "desc"]],
-            ajax: $.fn.dataTable.pipeline({
-                url: '{!! route('public.history') !!}',
-                data : {
-                    'id' : 1 
-                },
-                pages: 5
-            })
-        });
-        */
-
-        $('input[name="keyword"]').focus();
-
+        $('input[name="keyword"]').prop('disabled', false).focus();
         $('.num-format').number(true);
 
         //confirm btn
@@ -252,6 +206,11 @@
         var id;
         var search = true;
 
+        var customerId = $('.customer-id');
+        var customerName = $('.customer-name');
+        var cardType = $('.card-type');
+        var totalPoint = $('.total-point');
+
         function generate(k){
             if(search){
                 $.ajax({
@@ -259,18 +218,28 @@
                     data : {search : k},
                     method : 'POST'
                 }).done(function (response){
+
+                    console.log(response);
+
                     if(response.data.length == 1){
                         info = response.data[0];
                         keyword = k;
                         id = info.id;
                         
-                        (info.profile == null) ? profile.attr('src', '../img/brand/LOGO.PNG') : profile.attr('src', '../img/profile/'+info.profile);
+                        (info.profile == null) ? profile.attr('src', '../img/profile/person.png') : profile.attr('src', '../img/profile/'+info.profile);
+                        customerId.val(info.customer_code);
+                        customerName.val(info.name);
+                        cardType.val(info.rule.card_name);
+                        totalPoint.val(numeral(response.point).format('0,0'));
+
+                        /*
                         transaksi.text(response.transaksi);
                         nilai.text(numeral(response.nilai).format('0,0'));
                         point.text(numeral(response.point).format('0,0'));
                         nama.text(info.name);
                         notlp.text(info.phone);
                         alamat.text(info.address);
+                        */
 
                         $.ajax({
                             url : '{!! route('public.history') !!}',
@@ -305,6 +274,7 @@
                             */
                         });
                     }else{
+                        alert('Customer data not found');
                         clear();
                     }
                 });
@@ -312,66 +282,25 @@
         }
 
         function clear(){
-            //$('input[name="keyword"]').val('');
-            inpTransaksi.val('');
-            inpTransaksi.prop('disabled', true);
-            btnHistory.prop('disabled', true);
-            $('.history').text('Data kustomer tidak ditemukan');
-            transaksi.text(0);
-            nilai.text(0);
-            point.text(0);
-            nama.text('Nama Kustomer');
-            notlp.text('No Telp Kustomer');
-            alamat.text('Alamat Kustomer');
+
+            profile.attr('src', '../img/profile/person.png');
+            customerId.val('Customer ID');
+            customerName.val('Customer Name');
+            cardType.val('Card Type');
+            totalPoint.val('Total Point');
+            $('.history').text('Customer data not found');
         }
 
-        btnHistory.click(function(e) {
-            e.preventDefault();
-            
-            if(parseFloat(inpTransaksi.val()) < 1 || inpTransaksi.val() == ''){
-                alert('Nilai transaksi tidak boleh 0');
-                inpTransaksi.focus();
-            }else{
-                $(this).prop('disabled', true);
+        $('body').on('submit', 'form.redeem-point', function(e) {
+            e.preventDefault()
+            var code = $('input[name="keyword"]').val();
 
-                $.ajax({
-                    url : '{!! route('public.redeem') !!}',
-                    data : {
-                        customer_id : id,
-                        amount : inpTransaksi.val()
-                    },
-                    method : 'POST'
-                }).done(function (response){
-
-                    if(response.status){
-                        alert(response.msg);
-                        generate(keyword);
-
-                        inpTransaksi.val('').prop('disabled', true);
-                        $('input[name="keyword"]').focus();
-                    }else{
-                        alert(response.msg);
-                        btnHistory.prop('disabled', false);
-                        inpTransaksi.focus();
-                    }
-                });
-            }
-        });
-
-        $('body').on('change', 'input[name="keyword"]', function() {
-            if($(this).val().length > 2){
-                generate($(this).val());
+            if(code.length > 2){
+                generate(code);
             }else{
                 clear();
             }
         });
-
-        /*
-        inpTransaksi.blur(function() {
-            $(this).prop('disabled', true);
-            btnHistory.prop('disabled', true);
-        });
-        */
     });
 </script>
 </body>

@@ -5,33 +5,92 @@
 @endsection
 
 @section('brand')
-    Kustomer
+    Customer
 @endsection
 
 @section('content')
     @component('component.modal', ['target' => 'kustomer'])
         @slot('title')
-            TAMBAH DATA
+            ADD DATA
         @endslot
 
         <form method="POST" action="{{route('customer.store')}}" enctype="multipart/form-data">
             @csrf
+            <legend>Personal Information</legend>
+            <hr>
             <div class="form-group">
-                <label>Nama</label>
+                <label>Name</label>
                 <input type="text" class="form-control" name="name" required>
             </div>
             <div class="form-group">
-                <label>No. Telp</label>
+                <label>Phone</label>
                 <input type="text" class="form-control" name="phone">
             </div>
             <div class="form-group">
-                <label>Alamat</label>
+                <label>Mobile</label>
+                <input type="text" class="form-control" name="mobile">
+            </div>
+            <div class="form-group">
+                <label>Postal Code</label>
+                <input type="text" class="form-control" name="postal_code">
+            </div>
+            <div class="form-group">
+                <label>Fax</label>
+                <input type="text" class="form-control" name="fax">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" name="email">
+            </div>
+            <div class="form-group">
+                <label>Sex</label>
+                <select name="sex" class="form-control">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Birth Date</label>
+                <input type="text" class="form-control date-picker" name="birth_date">
+            </div>
+            <div class="form-group">
+                <label>Nationality</label>
+                <select name="nationality" class="form-control">
+                    @foreach ($nationalities as $item)
+                        <option value="{{$item->nationality}}">{{$item->nationality}}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Address</label>
                 <textarea name="address" class="form-control" rows="5"></textarea>
             </div>
             <div class="form-group">
                 <label>Foto</label>
                 <input type="file" class="form-control" name="profile">
             </div>
+            <legend>VIP</legend>
+            <hr>
+            <div class="form-group">
+                <label>Cardkey Code</label>
+                <input type="text" class="form-control" name="customer_code" required>
+            </div>
+            <div class="form-group">
+                <label>Card Type</label>
+                <select name="rule_id" class="form-control" required>
+                    @foreach ($rules as $item)
+                        <option value="{{$item->id}}">{{$item->card_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Commence On</label>
+                <input type="text" class="form-control date-picker" name="commence_on">
+            </div>
+            <div class="form-group">
+                    <label>Expires On</label>
+                    <input type="text" class="form-control date-picker" name="expires_on">
+                </div>
             <div class="form-group">
                 <div>
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -49,10 +108,10 @@
                 <div class="card-header bg-transparent">
                     <div class="row align-items-center">
                         <div class="col-8">
-                            <h3 class="mb-0">List Kustomer</h3>
+                            <h3 class="mb-0">Customer List</h3>
                         </div>
                         <div class="col-4 text-right">
-                            <a href="#!" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#kustomer"><i class="fas fa-plus-circle fa-fw"></i> Tambah Data</a>
+                            <a href="#!" class="btn btn-primary" data-toggle="modal" data-target="#kustomer"><i class="fas fa-plus-circle fa-fw"></i> Add Data</a>
                         </div>
                     </div>
                 </div>
@@ -62,7 +121,7 @@
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control date-range-picker periode">
                                 <div class="input-group-append">
-                                    <button class="btn btn-info btn-sm" type="button"><i class="fas fa-calendar-alt"></i></button>
+                                    <button class="btn btn-info btn-sm date-filter" type="button">COMMENCE ON</button>
                                 </div>
                             </div>
                         </div>
@@ -83,12 +142,13 @@
                         <table class="table table-striped table-hover table-sm table-bordered dt-ajax">
                             <thead>
                                 <tr>
-                                    <th class="text-center">Kode Kustomer</th>
-                                    <th class="text-center">Nama</th>
-                                    <th class="text-center">No. Telp</th>
-                                    <th class="text-center">Alamat</th>
-                                    <th class="text-center">Tgl. Daftar</th>
-                                    <th class="text-center">Update Terakhir</th>
+                                    <th class="text-center">Customer ID</th>
+                                    <th class="text-center">Name</th>
+                                    <th class="text-center">Mobile</th>
+                                    <th class="text-center">Card Type</th>
+                                    <th class="text-center">Points</th>
+                                    <th class="text-center">Commence On</th>
+                                    <th class="text-center">Expires On</th>
                                     <th class="text-center"></th>
                                 </tr>
                             </thead>
@@ -112,6 +172,16 @@ $(function() {
     var start= '';
     var end = '';
     var search = '';
+    var alt = false;
+
+    $('body').on('click', '.date-filter', function() {
+        alt = !alt;
+        if(alt){
+            $(this).text('EXPIRES ON').removeClass('btn-info').addClass('btn-primary');
+        }else{
+            $(this).text('COMMENCE ON').removeClass('btn-primary').addClass('btn-info');
+        }
+    });
     
     var table = $('.dt-ajax').DataTable({
         processing: true,
@@ -120,12 +190,13 @@ $(function() {
             {'searchable':true, 'orderable':false},
             null,
             {'searchable':true, 'orderable':false},
-            {'searchable':true, 'orderable':false},
+            {'searchable':false, 'orderable':false},
+            {'searchable':false, 'orderable':false},
             null,
             null,
             {'searchable':false, 'orderable':false},
         ],
-        order: [[4, "desc"]],
+        order: [[5, "desc"]],
         ajax: $.fn.dataTable.pipeline({
             url: '{!! route('customer.index.dt') !!}',
             pages: 5
@@ -138,14 +209,13 @@ $(function() {
         end = p.endDate.format('YYYY-MM-DD')
         search = table.search();
 
-        table.search(start+'|'+end).draw();
+        table.search(start+'|'+end+'|'+alt).draw();
     });
 
     table.on('search.dt', function() {
         search = table.search();
         $('input[name="search"]').val(search);
     });
-
 });
 </script>
 @endpush

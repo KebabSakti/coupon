@@ -20,10 +20,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>
-    Coupon App Admin Login
+      Redeem Coupon App - SCORE SPORTS AND LOUNGE
   </title>
   <!-- Favicon -->
-<link href="{{asset('img/brand/favicon.png')}}" rel="icon" type="image/png">
+<link href="{{asset('img/brand/score.png')}}" rel="icon" type="image/png">
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
   <!-- Icons -->
@@ -41,12 +41,12 @@
         <div class="header-body text-center mb-5">
           <div class="row justify-content-center">
             <div class="col">
-                <!-- <img src="{{asset('img/brand/LOGO.png')}}" width="200"> -->
+              <img src="{{asset('img/brand/score.png')}}" width="200">
             </div>
           </div>
           <div class="row justify-content-center">
             <div class="col-lg-5 col-md-6">
-              <h1 class="text-white">Coupon App Admin Login</h1>
+              <h1 class="text-white">Admin Login</h1>
               @if (session('message'))
                 @component('component.alert')
                 <i class="fas fa-exclamation-triangle fa-fw"></i> {{ session('message') }}
